@@ -3,10 +3,12 @@ package com.userservice.usermanagement.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.userservice.usermanagement.security.jwt.AuthEntryPointJwt;
 import com.userservice.usermanagement.security.jwt.AuthTokenFilter;
 import com.userservice.usermanagement.security.services.UserDetailsServiceImpl;
+
+
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthTokenFilter authenticationJwtTokenFilter() {
 		return new AuthTokenFilter();
 	}
+	
 
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -51,15 +56,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+	public void configure( HttpSecurity http) throws Exception {
+		
 		http.cors().and().csrf().disable()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/api/auth/signin").permitAll()
+			.authorizeRequests().antMatchers("/api/auth/signin").permitAll()			
+			.antMatchers(
+                    HttpMethod.GET,
+                    "/",
+                    "/v2/api-docs",           // swagger
+                    "/webjars/**",            // swagger-ui webjars
+                    "/swagger-resources/**",  // swagger-ui resources
+                    "/configuration/**",      // swagger configuration
+                    "/*.html",
+                    "/favicon.ico",
+                    "/**/*.html",
+                    "/**/*.css",
+                    "/**/*.js"
+            ).permitAll()
 			.anyRequest().authenticated();
-
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 }
