@@ -13,6 +13,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.userservice.usermanagement.models.User;
 
 public class UserDetailsImpl implements UserDetails {
+	/**
+	 * User details implementation to get user data
+	 */
+	
 	private static final long serialVersionUID = 1L;
 
 	private String id;

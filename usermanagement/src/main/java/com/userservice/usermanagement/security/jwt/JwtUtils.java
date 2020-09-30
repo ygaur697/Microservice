@@ -14,6 +14,11 @@ import com.userservice.usermanagement.security.services.UserDetailsImpl;
 
 @Component
 public class JwtUtils {
+	/**
+	 * Generate Jwt from username, date, expiration, secret
+	 * get username from jwt
+	 * validate a jwt
+	 */
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
 	@Value("${userservice.app.jwtSecret}")
@@ -22,7 +27,7 @@ public class JwtUtils {
 	@Value("${userservice.app.jwtExpirationMs}")
 	private int jwtExpirationMs;
 
-	public String generateJwtToken(Authentication authentication) {
+	public String generateJwtToken(Authentication authentication) {  
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -38,7 +43,7 @@ public class JwtUtils {
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
 
-	public boolean validateJwtToken(String authToken) {
+	public boolean validateJwtToken(String authToken) {   //Validation based on secret key
 		try {
 			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
 			return true;

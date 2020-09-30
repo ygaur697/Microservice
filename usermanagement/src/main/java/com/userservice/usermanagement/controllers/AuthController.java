@@ -34,6 +34,11 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+/**
+ * This class is a controller for use case in Authentication 
+ * It authenticates the User based on its unique username and password
+ */
+
 public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
@@ -52,12 +57,16 @@ public class AuthController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
+        /*
+         * This function takes the input of the user and after authentication generates
+         * the jwt token for further requests
+         */
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
+		
+		String jwt = jwtUtils.generateJwtToken(authentication);   //Call to generate jwt token
 		
 		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
 		List<String> roles = userDetails.getAuthorities().stream()
@@ -68,7 +77,7 @@ public class AuthController {
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 
 												 userDetails.getEmail(), 
-												 roles));
+												 roles));      
 	}
 
 	

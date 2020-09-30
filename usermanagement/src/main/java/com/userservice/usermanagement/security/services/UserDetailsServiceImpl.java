@@ -13,6 +13,9 @@ import com.userservice.usermanagement.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+	/**
+	 * Used for getting user details
+	 */
 	@Autowired
 	UserRepository userRepository;
 
@@ -22,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-		return UserDetailsImpl.build(user);
+		return UserDetailsImpl.build(user); //build a userdetails object 
 	}
 
 }

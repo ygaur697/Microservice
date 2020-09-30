@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "roles")
 public class Role {
+	/**
+	 * Model for role with all the attributes
+	 */
 	  @Id
 	  private String id;
 

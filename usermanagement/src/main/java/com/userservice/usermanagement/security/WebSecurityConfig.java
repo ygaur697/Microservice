@@ -20,15 +20,15 @@ import com.userservice.usermanagement.security.jwt.AuthEntryPointJwt;
 import com.userservice.usermanagement.security.jwt.AuthTokenFilter;
 import com.userservice.usermanagement.security.services.UserDetailsServiceImpl;
 
-
-
 @Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(
-		// securedEnabled = true,
-		// jsr250Enabled = true,
-		prePostEnabled = true)
+@EnableWebSecurity //global web security
+@EnableGlobalMethodSecurity(		
+		prePostEnabled = true)  // enables PreAuthorize and PostAuthorize
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+	/**
+	 * Implementation of the security adapter by overriding methods
+	 */
+	
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
 
@@ -42,6 +42,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 
 	@Override
+	/*
+	 * Overriding this configure method to to configure authentication 
+	 * manager builder
+	 */
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 		authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
 	}
@@ -54,15 +58,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
+		return new BCryptPasswordEncoder();   //Encoding password
 	}
 	@Override
 	public void configure( HttpSecurity http) throws Exception {
-		
+		/*
+		 * Configure Authorization by overriding this method
+		 */
 		http.cors().and().csrf().disable()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-			.authorizeRequests().antMatchers("/api/auth/signin").permitAll()			
+			/*
+			 * Any user should be allowed to sign in
+			 */
+			.authorizeRequests().antMatchers("/api/auth/signin").permitAll()	
+			.antMatchers("/api/auth/adduser").permitAll()	
 			.antMatchers(
                     HttpMethod.GET,
                     "/",
@@ -75,7 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     "/**/*.html",
                     "/**/*.css",
                     "/**/*.js"
-            ).permitAll()
+            ).permitAll() 			          // All the necessary files to be permitted for swagger
 			.anyRequest().authenticated();
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}

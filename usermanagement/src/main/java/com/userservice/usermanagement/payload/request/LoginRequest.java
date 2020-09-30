@@ -1,7 +1,9 @@
 package com.userservice.usermanagement.payload.request;
 
 public class LoginRequest {
-	
+	/**
+	 * Login request definition
+	 */
 	private String username;
 
 	

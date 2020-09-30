@@ -21,6 +21,9 @@ import org.springframework.util.StringUtils;
 import com.userservice.usermanagement.security.services.UserDetailsServiceImpl;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
+	/**
+	 * Executes once per request
+	 */
 	  @Autowired
 	  private JwtUtils jwtUtils;
 
@@ -31,9 +34,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
 	  @Override
 	  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+	  /*
+	   * Fetches Jwt from header
+	   * Parses and validates Jwt
+	   * Get userdetails from username to create an authentication object
+	   * Sets the current userdetails in security context
+	   */
 	      throws ServletException, IOException {
 	    try {
 	      String jwt = parseJwt(request);
+	      
 	      if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 	        String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
@@ -52,6 +62,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	  }
 
 	  private String parseJwt(HttpServletRequest request) {
+		  /*
+		   * Get the Jwt token 
+		   */
 	    String headerAuth = request.getHeader("Authorization");
 
 	    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {

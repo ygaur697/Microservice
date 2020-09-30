@@ -8,7 +8,12 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "user_data")
+
 public class User {
+	/**
+	 * User model
+	 */
+	
 	  @Id
 	  private String id;
 
@@ -20,16 +25,50 @@ public class User {
 
 	  
 	  private String password;
+	  
+	  private String customername;
+	  
+	  private String customerid;
+	  
+	  private String description;
+	  
 
-	  @DBRef
+	  public String getCustomerid() {
+		return customerid;
+	}
+
+	public void setCustomerid(String customerid) {
+		this.customerid = customerid;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getCustomername() {
+		return customername;
+	}
+
+	public void setCustomername(String customername) {
+		this.customername = customername;
+	}
+
+	@DBRef
 	  private Set<Role> roles = new HashSet<>();
 
 	  public User() {
 	  }
 
-	  public User(String username, String email, String password) {
+	  public User(String username, String email, String customername,String customerid,String description, String password) {
 	    this.username = username;
 	    this.email = email;
+	    this.customername = customername;
+	    this.customerid = customerid;
+	    this.description = description;
 	    this.password = password;
 	  }
 
