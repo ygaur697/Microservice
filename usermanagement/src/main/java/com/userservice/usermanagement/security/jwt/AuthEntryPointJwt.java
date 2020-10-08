@@ -17,8 +17,8 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
 	@Override
 	/*
-	 * Gets triggered every time unauthenticated user requests a secure 
-	 * http resource
+	 * Gets triggered every time unauthenticated user requests a secure http
+	 * resource
 	 */
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {

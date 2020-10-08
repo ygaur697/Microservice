@@ -1,8 +1,6 @@
 package com.userservice.usermanagement.controllers;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.userservice.usermanagement.models.Role;
-import com.userservice.usermanagement.models.URole;
-import com.userservice.usermanagement.models.User;
 import com.userservice.usermanagement.payload.request.LoginRequest;
-import com.userservice.usermanagement.payload.request.SignupRequest;
 import com.userservice.usermanagement.payload.response.JwtResponse;
-import com.userservice.usermanagement.payload.response.MessageResponse;
-import com.userservice.usermanagement.repository.RoleRepository;
-import com.userservice.usermanagement.repository.UserRepository;
+import com.userservice.usermanagement.repository.MongoRoleRepository;
+import com.userservice.usermanagement.repository.MongoUserRepository;
 import com.userservice.usermanagement.security.jwt.JwtUtils;
 import com.userservice.usermanagement.security.services.UserDetailsImpl;
 import javax.validation.Valid;
@@ -35,8 +28,8 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 /**
- * This class is a controller for use case in Authentication 
- * It authenticates the User based on its unique username and password
+ * This class is a controller for use case in Authentication It authenticates
+ * the User based on its unique username and password
  */
 
 public class AuthController {
@@ -44,10 +37,10 @@ public class AuthController {
 	AuthenticationManager authenticationManager;
 
 	@Autowired
-	UserRepository userRepository;
+	MongoUserRepository userRepository;
 
 	@Autowired
-	RoleRepository roleRepository;
+	MongoRoleRepository roleRepository;
 
 	@Autowired
 	PasswordEncoder encoder;
@@ -56,29 +49,25 @@ public class AuthController {
 	JwtUtils jwtUtils;
 
 	@PostMapping("/signin")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        /*
-         * This function takes the input of the user and after authentication generates
-         * the jwt token for further requests
-         */
+	public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+		/*
+		 * This function takes the input of the user and after authentication generates
+		 * the jwt token for further requests
+		 */
+
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
-		String jwt = jwtUtils.generateJwtToken(authentication);   //Call to generate jwt token
-		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
+
+		String jwt = jwtUtils.generateJwtToken(authentication); // Call to generate jwt token
+
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 
-		return ResponseEntity.ok(new JwtResponse(jwt, 
-												 userDetails.getId(), 
-												 userDetails.getUsername(), 
-												 userDetails.getEmail(), 
-												 roles));      
+		return ResponseEntity.ok(
+				new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
 	}
 
-	
 }

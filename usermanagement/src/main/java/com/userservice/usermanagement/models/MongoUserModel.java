@@ -3,11 +3,18 @@ package com.userservice.usermanagement.models;
 import java.util.HashSet;
 import java.util.Set;
 
-public class User<E> {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "user_data")
+
+public class MongoUserModel {
 	/**
 	 * User model
 	 */
 
+	@Id
 	private String id;
 
 	private String username;
@@ -46,12 +53,13 @@ public class User<E> {
 		this.customername = customername;
 	}
 
-	protected Set<E> roles = new HashSet<>();
+	@DBRef
+	private Set<MongoRoleModel> roles = new HashSet<>();
 
-	public User() {
+	public MongoUserModel() {
 	}
 
-	public User(String username, String email, String customername, String customerid, String description,
+	public MongoUserModel(String username, String email, String customername, String customerid, String description,
 			String password) {
 		this.username = username;
 		this.email = email;
@@ -93,11 +101,11 @@ public class User<E> {
 		this.password = password;
 	}
 
-	public Set<E> getRoles() {
+	public Set<MongoRoleModel> getRoles() {
 		return roles;
 	}
 
-	protected void setRoles(Set<E> roles) {
+	public void setRoles(Set<MongoRoleModel> roles) {
 		this.roles = roles;
 	}
 }

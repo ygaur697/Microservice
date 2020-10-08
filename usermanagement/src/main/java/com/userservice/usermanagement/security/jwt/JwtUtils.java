@@ -10,13 +10,10 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.*;
 import com.userservice.usermanagement.security.services.UserDetailsImpl;
 
-
-
 @Component
 public class JwtUtils {
 	/**
-	 * Generate Jwt from username, date, expiration, secret
-	 * get username from jwt
+	 * Generate Jwt from username, date, expiration, secret get username from jwt
 	 * validate a jwt
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
@@ -27,23 +24,20 @@ public class JwtUtils {
 	@Value("${userservice.app.jwtExpirationMs}")
 	private int jwtExpirationMs;
 
-	public String generateJwtToken(Authentication authentication) {  
+	public String generateJwtToken(Authentication authentication) {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-		return Jwts.builder()
-				.setSubject((userPrincipal.getUsername()))
-				.setIssuedAt(new Date())
+		return Jwts.builder().setSubject((userPrincipal.getUsername())).setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-				.signWith(SignatureAlgorithm.HS512, jwtSecret)
-				.compact();
+				.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
 	}
 
 	public String getUserNameFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
 
-	public boolean validateJwtToken(String authToken) {   //Validation based on secret key
+	public boolean validateJwtToken(String authToken) { // Validation based on secret key
 		try {
 			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
 			return true;
