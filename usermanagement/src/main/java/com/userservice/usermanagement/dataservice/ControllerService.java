@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.userservice.usermanagement.dao.UserDao;
 import com.userservice.usermanagement.models.MongoRoleModel;
 import com.userservice.usermanagement.models.PostgresRoleModel;
 import com.userservice.usermanagement.models.URole;
+import com.userservice.usermanagement.models.User;
 import com.userservice.usermanagement.models.MongoUserModel;
 import com.userservice.usermanagement.models.PostgresUserModel;
 import com.userservice.usermanagement.payload.request.SignupRequest;
@@ -18,17 +18,24 @@ import com.userservice.usermanagement.repository.MongoRoleRepository;
 
 @Service
 public class ControllerService implements UserService {
+	/**
+	 * Author-Yash
+	 * This is controller service to detail the controller logic, with interface defined as UserService.
+	 */
 	@Autowired
-	private UserDao repository;
+	private UserDao<?> repository;
 	@Autowired
 	PasswordEncoder encoder;
 
 	@Autowired
-	MongoRoleRepository mongo_role_repository;
+	MongoRoleRepository mongoRoleRepository;
+
+	String roleError = "Error: Role is not found.";
 
 	@Override
 	public boolean existsByUsername(SignupRequest signUpRequest) {
-		if (repository.existsByUsername(signUpRequest.getUsername())) {
+		boolean existsByUsername = repository.existsByUsername(signUpRequest.getUsername());
+		if (Boolean.TRUE.equals(existsByUsername)) {
 			return true;
 		}
 		return false;
@@ -36,7 +43,8 @@ public class ControllerService implements UserService {
 
 	@Override
 	public boolean existsByEmail(SignupRequest signUpRequest) {
-		if (repository.existsByEmail(signUpRequest.getEmail())) {
+		boolean existsByEmail = repository.existsByEmail(signUpRequest.getEmail());
+		if (Boolean.TRUE.equals(existsByEmail)) {
 			return true;
 		}
 		return false;
@@ -44,15 +52,15 @@ public class ControllerService implements UserService {
 
 	@Override
 	public void createPostgresUser(SignupRequest signUpRequest) {
-		PostgresUserModel user = new PostgresUserModel(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getCustomername(),
-				signUpRequest.getCustomerid(), signUpRequest.getDescription(),
+		PostgresUserModel user = new PostgresUserModel(signUpRequest.getUsername(), signUpRequest.getEmail(),
+				signUpRequest.getCustomername(), signUpRequest.getCustomerid(), signUpRequest.getDescription(),
 				encoder.encode(signUpRequest.getPassword()));
 		Set<String> strRoles = signUpRequest.getRoles();
 		Set<PostgresRoleModel> roles = new HashSet<>();
 		PostgresRoleModel e = new PostgresRoleModel();
 		if (strRoles == null) {
 
-			throw new RuntimeException("Error: Role is not found.");
+			throw new RuntimeException(roleError);
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
@@ -66,7 +74,7 @@ public class ControllerService implements UserService {
 					break;
 
 				default:
-					throw new RuntimeException("Error: Invalid Role");
+					throw new RuntimeException(roleError);
 				}
 			});
 		}
@@ -78,35 +86,78 @@ public class ControllerService implements UserService {
 
 	@Override
 	public void createMongoUser(SignupRequest signUpRequest) {
-		MongoUserModel user = new MongoUserModel(signUpRequest.getUsername(), signUpRequest.getEmail(), signUpRequest.getCustomername(),
-				signUpRequest.getCustomerid(), signUpRequest.getDescription(),
+		MongoUserModel user = new MongoUserModel(signUpRequest.getUsername(), signUpRequest.getEmail(),
+				signUpRequest.getCustomername(), signUpRequest.getCustomerid(), signUpRequest.getDescription(),
 				encoder.encode(signUpRequest.getPassword()));
 		Set<String> strRoles = signUpRequest.getRoles();
 		Set<MongoRoleModel> roles = new HashSet<>();
 
 		if (strRoles == null) {
-			MongoRoleModel userRole = mongo_role_repository.findByName(URole.ROLE_USER)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+			MongoRoleModel userRole = mongoRoleRepository.findByName(URole.ROLE_USER)
+					.orElseThrow(() -> new RuntimeException(roleError));
 			roles.add(userRole);
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
 				case "admin":
-					MongoRoleModel adminRole = mongo_role_repository.findByName(URole.ROLE_ADMIN)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					MongoRoleModel adminRole = mongoRoleRepository.findByName(URole.ROLE_ADMIN)
+							.orElseThrow(() -> new RuntimeException(roleError));
 					roles.add(adminRole);
 
 					break;
 
 				default:
-					MongoRoleModel userRole = mongo_role_repository.findByName(URole.ROLE_USER)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					MongoRoleModel userRole = mongoRoleRepository.findByName(URole.ROLE_USER)
+							.orElseThrow(() -> new RuntimeException(roleError));
 					roles.add(userRole);
 				}
 			});
 		}
 		user.setRoles(roles);
 		repository.save(user);
+	}
+
+	@Override
+	public void updatePostgresUserPassword(User<?> user, String encodedPassword) {
+		String name = user.getUsername();
+		PostgresUserModel users = (PostgresUserModel) repository.findByUsername(name);
+		users.setPassword(encodedPassword);
+		repository.save(users);
+
+	}
+
+	@Override
+	public void updateMongoUserPassword(User<?> user, String encodedPassword) {
+		String name = user.getUsername();
+		MongoUserModel users = (MongoUserModel) repository.findByUsername(name);
+		users.setPassword(encodedPassword);
+		repository.save(users);
+	}
+
+	@Override
+	public void updatePostgresUser(User<?> user) {
+		String name = user.getUsername();
+		PostgresUserModel users = (PostgresUserModel) repository.findByUsername(name);
+		users.setUsername(user.getUsername());
+		users.setCustomerid(user.getCustomerid());
+		users.setCustomername(user.getCustomername());
+		users.setDescription(user.getDescription());
+		users.setEmail(user.getEmail());
+		repository.save(users);
+
+	}
+
+	@Override
+	public void updateMongoUser(User<?> user) {
+		String name = user.getUsername();
+		MongoUserModel users = (MongoUserModel) repository.findByUsername(name);
+		users.setUsername(user.getUsername());
+		users.setCustomerid(user.getCustomerid());
+		users.setCustomername(user.getCustomername());
+		users.setDescription(user.getDescription());
+		users.setEmail(user.getEmail());
+		repository.save(users);
+
 	}
 
 }

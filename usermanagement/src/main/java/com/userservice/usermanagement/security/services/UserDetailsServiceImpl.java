@@ -16,6 +16,7 @@ import com.userservice.usermanagement.repository.PostgresUserRepository;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 	/**
+	 * Author-Yash
 	 * Used for getting user details
 	 */
 
@@ -23,14 +24,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	PostgresUserRepository userRepository;
 
 	@Autowired
-	private UserDao repository;
+	private UserDao<?> repository;
 
 	@Value("${Postgres.value}")
 	private boolean dbType;
 
 	@Override
 	@Transactional
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username)  {
 
 		if (dbType) {
 

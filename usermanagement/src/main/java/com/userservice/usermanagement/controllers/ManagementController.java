@@ -3,6 +3,8 @@ package com.userservice.usermanagement.controllers;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +35,7 @@ public class ManagementController {
 	/**
 	 * Management controller is for all the crud operations needful for user
 	 * management
-	 * 
+	 * Author-Yash
 	 */
 	AuthenticationManager authenticationManager;
 
@@ -44,7 +46,7 @@ public class ManagementController {
 	PasswordEncoder encoder;
 
 	@Autowired
-	private UserDao repository;
+	private UserDao<?> repository;
 
 	@Autowired
 	@Value("${Postgres.value}")
@@ -53,6 +55,8 @@ public class ManagementController {
 	@Autowired
 	ControllerService service;
 
+	String userNameException = "Error: Username is already taken!";
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	@PostMapping("/adduser")
 //	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
@@ -63,25 +67,26 @@ public class ManagementController {
 		if (dbValue) {
 
 			if (service.existsByUsername(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
 			}
 
 			if (service.existsByEmail(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
 			}
 			service.createPostgresUser(signUpRequest);
 		}
 
 		else {
 			if (service.existsByUsername(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
 			}
 
 			if (service.existsByEmail(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
 			}
 			service.createMongoUser(signUpRequest);
 		}
+		logger.info("{}","User Added successfully!");
 		return ResponseEntity.ok(new MessageResponse("User Added successfully!"));
 	}
 
@@ -96,7 +101,7 @@ public class ManagementController {
 
 	@PutMapping("/updatepassword")
 	@PreAuthorize("hasRole('ADMIN')")
-	public String updatepassword(@RequestBody User user) {
+	public String updatepassword(@RequestBody User<?> user) {
 		String encodedPassword = null;
 		if (user != null) {
 			if (user.getPassword() != null) {
@@ -104,15 +109,9 @@ public class ManagementController {
 			}
 
 			if (dbValue) {
-				String name = user.getUsername();
-				PostgresUserModel users = (PostgresUserModel) repository.findByUsername(name);
-				users.setPassword(encodedPassword);
-				repository.save(users);
+				service.updatePostgresUserPassword(user, encodedPassword);
 			} else {
-				String name = user.getUsername();
-				MongoUserModel users = (MongoUserModel) repository.findByUsername(name);
-				users.setPassword(encodedPassword);
-				repository.save(users);
+				service.updateMongoUserPassword(user, encodedPassword);
 			}
 		}
 		return "User updated";
@@ -120,27 +119,13 @@ public class ManagementController {
 
 	@PutMapping("/updateuser")
 	@PreAuthorize("hasRole('ADMIN')")
-	public String updateuser(@RequestBody User user) {
+	public String updateuser(@RequestBody User<?> user) {
 
 		if (user != null) {
 			if (dbValue) {
-				String name = user.getUsername();
-				PostgresUserModel users = (PostgresUserModel) repository.findByUsername(name);
-				users.setUsername(user.getUsername());
-				users.setCustomerid(user.getCustomerid());
-				users.setCustomername(user.getCustomername());
-				users.setDescription(user.getDescription());
-				users.setEmail(user.getEmail());
-				repository.save(users);
+				service.updatePostgresUser(user);
 			} else {
-				String name = user.getUsername();
-				MongoUserModel users = (MongoUserModel) repository.findByUsername(name);
-				users.setUsername(user.getUsername());
-				users.setCustomerid(user.getCustomerid());
-				users.setCustomername(user.getCustomername());
-				users.setDescription(user.getDescription());
-				users.setEmail(user.getEmail());
-				repository.save(users);
+				service.updateMongoUser(user);
 			}
 		}
 		return "User details updated";

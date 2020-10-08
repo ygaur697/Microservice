@@ -9,7 +9,10 @@ import com.userservice.usermanagement.models.PostgresUserModel;
 import com.userservice.usermanagement.repository.MongoUserRepository;
 
 public class UserMongoDao implements UserDao<MongoUserModel> {
-
+	/**
+	 * Author-Yash
+	 * This is mongo dao that sits between Mongo db and and User Dao for data abstraction
+	 */
 	@Autowired
 	private MongoUserRepository repo;
 
@@ -39,7 +42,7 @@ public class UserMongoDao implements UserDao<MongoUserModel> {
 
 	@Override
 	public void save(PostgresUserModel users) {
-
+		//Left empty just to full fill UserDao contract
 	}
 
 	@Override

@@ -12,7 +12,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
-
+	/**
+	 * Author-Yash
+	 * 
+	 */
 	private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
 	@Override

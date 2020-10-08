@@ -15,6 +15,7 @@ import com.userservice.usermanagement.models.PostgresUserModel;
 
 public class UserDetailsImpl implements UserDetails {
 	/**
+	 * Author-Yash
 	 * User details implementation to get user data
 	 */
 

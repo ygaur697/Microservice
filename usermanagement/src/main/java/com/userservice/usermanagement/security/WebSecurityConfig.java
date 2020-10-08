@@ -24,6 +24,7 @@ import com.userservice.usermanagement.security.services.UserDetailsServiceImpl;
 @EnableGlobalMethodSecurity(prePostEnabled = true) // enables PreAuthorize and PostAuthorize
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	/**
+	 * Author-Yash
 	 * Implementation of the security adapter by overriding methods
 	 */
 
@@ -71,12 +72,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests().antMatchers("/api/auth/signin").permitAll()
 
 				// this disables session creation on Spring Security
-				.antMatchers("/api/auth/adduser").permitAll().antMatchers(HttpMethod.GET, "/", "/v2/api-docs", // swagger
+				.antMatchers("/api/auth/adduser").permitAll()
+				.antMatchers(HttpMethod.GET, "/", "/v2/api-docs", // swagger
 						"/webjars/**", // swagger-ui webjars
 						"/swagger-resources/**", // swagger-ui resources
 						"/configuration/**", // swagger configuration
 						"/*.html", "/favicon.ico", "/**/*.html", "/**/*.css", "/**/*.js")
+				 
 				.permitAll() // All the necessary files to be permitted for swagger
+				.antMatchers("/actuator/health").permitAll()
 				.anyRequest().authenticated();
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

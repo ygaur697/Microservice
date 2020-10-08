@@ -13,6 +13,7 @@ import com.userservice.usermanagement.security.services.UserDetailsImpl;
 @Component
 public class JwtUtils {
 	/**
+	 * Author-Yash
 	 * Generate Jwt from username, date, expiration, secret get username from jwt
 	 * validate a jwt
 	 */

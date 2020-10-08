@@ -10,6 +10,7 @@ import com.userservice.usermanagement.models.PostgresUserModel;
 @Repository
 public interface PostgresUserRepository extends JpaRepository<PostgresUserModel, String> {
 	/**
+	 * Author-Yash
 	 * User repository with needful custom query to perform basic operations
 	 */
 	Optional<PostgresUserModel> findByUsername(String username); // find user name

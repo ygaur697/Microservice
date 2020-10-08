@@ -9,7 +9,7 @@ import com.userservice.usermanagement.models.PostgresRoleModel;
 
 @Repository
 public interface PostgresRoleRepository extends JpaRepository<PostgresRoleModel, String> {
-	/**
+	/**Author-Yash
 	 * Role repository with custom query function to find role
 	 */
 	Optional<PostgresRoleModel> findByName(String string);

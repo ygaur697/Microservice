@@ -28,6 +28,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 /**
+ * Author-Yash
  * This class is a controller for use case in Authentication It authenticates
  * the User based on its unique username and password
  */

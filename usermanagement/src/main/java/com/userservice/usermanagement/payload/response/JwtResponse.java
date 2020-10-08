@@ -3,6 +3,10 @@ package com.userservice.usermanagement.payload.response;
 import java.util.List;
 
 public class JwtResponse {
+	/**
+	 * Author-Yash
+	 * Jwt Response definition
+	 */
 	private String token;
 	private String type = "Bearer";
 	private String id;

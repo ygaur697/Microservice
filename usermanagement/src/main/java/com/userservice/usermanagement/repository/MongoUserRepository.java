@@ -8,6 +8,7 @@ import com.userservice.usermanagement.models.MongoUserModel;
 
 public interface MongoUserRepository extends MongoRepository<MongoUserModel, String> {
 	/**
+	 * Author - Yash
 	 * User repository with needful custom query to perform basic operations
 	 */
 	Optional<MongoUserModel> findByUsername(String username); // find user name
