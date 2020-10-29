@@ -4,11 +4,12 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.userservice.usermanagement.models.MongoUserModel;
-import com.userservice.usermanagement.models.PostgresUserModel;
-import com.userservice.usermanagement.repository.MongoUserRepository;
 
-public class UserMongoDao implements UserDao<MongoUserModel> {
+import com.userservice.usermanagement.models.UserModel;
+import com.userservice.usermanagement.mongoRepository.MongoUserRepository;
+
+
+public class UserMongoDao implements UserDao<UserModel> {
 	/**
 	 * Author-Yash
 	 * This is mongo dao that sits between Mongo db and and User Dao for data abstraction
@@ -17,7 +18,7 @@ public class UserMongoDao implements UserDao<MongoUserModel> {
 	private MongoUserRepository repo;
 
 	@Override
-	public MongoUserModel findByUsername(String username) {
+	public UserModel findByUsername(String username) {
 
 		return repo.findByUsername(username).get();
 	}
@@ -35,20 +36,18 @@ public class UserMongoDao implements UserDao<MongoUserModel> {
 	}
 
 	@Override
-	public Optional<MongoUserModel> deleteByUsername(String username) {
+	public Optional<UserModel> deleteByUsername(String username) {
 
 		return repo.deleteByUsername(username);
 	}
 
-	@Override
-	public void save(PostgresUserModel users) {
-		//Left empty just to full fill UserDao contract
-	}
-
-	@Override
-	public void save(MongoUserModel users) {
+	
+	public void save(UserModel users) {
 
 		repo.save(users);
 	}
+
+	
+	
 
 }

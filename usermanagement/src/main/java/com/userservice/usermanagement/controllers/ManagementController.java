@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.userservice.usermanagement.dao.UserDao;
 import com.userservice.usermanagement.dataservice.ControllerService;
-import com.userservice.usermanagement.models.User;
-import com.userservice.usermanagement.models.MongoUserModel;
-import com.userservice.usermanagement.models.PostgresUserModel;
+
+import com.userservice.usermanagement.models.UserModel;
 import com.userservice.usermanagement.payload.request.SignupRequest;
 import com.userservice.usermanagement.payload.response.MessageResponse;
 
@@ -34,12 +33,10 @@ import com.userservice.usermanagement.payload.response.MessageResponse;
 public class ManagementController {
 	/**
 	 * Management controller is for all the crud operations needful for user
-	 * management
-	 * Author-Yash
+	 * management Author-Yash
 	 */
 	AuthenticationManager authenticationManager;
 
-	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Autowired
@@ -57,6 +54,7 @@ public class ManagementController {
 
 	String userNameException = "Error: Username is already taken!";
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@PostMapping("/adduser")
 //	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<MessageResponse> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
@@ -64,29 +62,17 @@ public class ManagementController {
 		 * This controller Creates new user based on all the entities for the user
 		 * 
 		 */
-		if (dbValue) {
 
-			if (service.existsByUsername(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
-			}
-
-			if (service.existsByEmail(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
-			}
-			service.createPostgresUser(signUpRequest);
+		if (service.existsByUsername(signUpRequest)) {
+			return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
 		}
 
-		else {
-			if (service.existsByUsername(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
-			}
-
-			if (service.existsByEmail(signUpRequest)) {
-				return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
-			}
-			service.createMongoUser(signUpRequest);
+		if (service.existsByEmail(signUpRequest)) {
+			return ResponseEntity.badRequest().body(new MessageResponse(userNameException));
 		}
-		logger.info("{}","User Added successfully!");
+		service.createUser(signUpRequest);
+
+		logger.info("{}", "User Added successfully!");
 		return ResponseEntity.ok(new MessageResponse("User Added successfully!"));
 	}
 
@@ -101,32 +87,25 @@ public class ManagementController {
 
 	@PutMapping("/updatepassword")
 	@PreAuthorize("hasRole('ADMIN')")
-	public String updatepassword(@RequestBody User<?> user) {
+	public String updatepassword(@RequestBody UserModel user) {
 		String encodedPassword = null;
 		if (user != null) {
 			if (user.getPassword() != null) {
 				encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
 			}
 
-			if (dbValue) {
-				service.updatePostgresUserPassword(user, encodedPassword);
-			} else {
-				service.updateMongoUserPassword(user, encodedPassword);
-			}
+			service.updateUserPassword(user, encodedPassword);
+
 		}
 		return "User updated";
 	}
 
 	@PutMapping("/updateuser")
 	@PreAuthorize("hasRole('ADMIN')")
-	public String updateuser(@RequestBody User<?> user) {
+	public String updateuser(@RequestBody UserModel user) {
 
 		if (user != null) {
-			if (dbValue) {
-				service.updatePostgresUser(user);
-			} else {
-				service.updateMongoUser(user);
-			}
+			service.updateUser(user);
 		}
 		return "User details updated";
 

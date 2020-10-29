@@ -10,8 +10,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.userservice.usermanagement.models.MongoUserModel;
-import com.userservice.usermanagement.models.PostgresUserModel;
+
+import com.userservice.usermanagement.models.UserModel;
 
 public class UserDetailsImpl implements UserDetails {
 	/**
@@ -41,7 +41,8 @@ public class UserDetailsImpl implements UserDetails {
 		UserDetailsImpl.authorities = authorities;
 	}
 
-	public static UserDetailsImpl build(PostgresUserModel user) {
+	
+	public static UserDetailsImpl build(UserModel user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
 
@@ -101,10 +102,5 @@ public class UserDetailsImpl implements UserDetails {
 		return Objects.equals(id, user.id);
 	}
 
-	public static UserDetailsImpl build(MongoUserModel user) {
-		List<GrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
-
-		return new UserDetailsImpl(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), authorities);
-	}
+	
 }

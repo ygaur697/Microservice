@@ -7,10 +7,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Entity
+@Document(collection = "roles")
 @Table(name = "roles")
-public class PostgresRoleModel {
+public class RoleModel {
 	/**
 	 * Model for role with all the attributes
 	 */
@@ -18,17 +20,17 @@ public class PostgresRoleModel {
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "roleId", nullable = false, length = 1024)
-	private String roleId;
+	private String id;
 
 	@Column(name = "name", nullable = false, length = 1024)
 	private String name;
 
-	public String getRoleId() {
-		return roleId;
+	public String getid() {
+		return id;
 	}
 
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
+	public void setid(String id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -40,3 +42,5 @@ public class PostgresRoleModel {
 	}
 
 }
+
+

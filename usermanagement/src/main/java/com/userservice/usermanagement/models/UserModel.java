@@ -14,10 +14,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Entity
+@Document(collection = "user_data")
 @Table(name = "users")
-public class PostgresUserModel {
+public class UserModel {
 	/**
 	 * User model
 	 */
@@ -39,14 +42,15 @@ public class PostgresUserModel {
 	@Column(name = "description", nullable = false, length = 1024)
 	private String description;
 
+	@DBRef
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_id")
-	private Set<PostgresRoleModel> roles = new HashSet<>();
+	@JoinColumn(name = "user_id")	
+	private Set<RoleModel> roles;
 
-	public PostgresUserModel() {
+	public UserModel() {
 	}
 
-	public PostgresUserModel(String username, String email, String customername, String customerid, String description,
+	public UserModel(String username, String email, String customername, String customerid, String description,
 			String password) {
 		this.username = username;
 		this.email = email;
@@ -111,12 +115,12 @@ public class PostgresUserModel {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-	public Set<PostgresRoleModel> getRoles() {
+   
+	public Set<RoleModel> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Set<PostgresRoleModel> roles) {
+	public void setRoles(Set<RoleModel> roles) {
 		this.roles = roles;
 	}
 

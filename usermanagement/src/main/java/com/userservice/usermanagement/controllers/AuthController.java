@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.userservice.usermanagement.dao.RoleDao;
+import com.userservice.usermanagement.dao.UserDao;
+
 import com.userservice.usermanagement.payload.request.LoginRequest;
 import com.userservice.usermanagement.payload.response.JwtResponse;
-import com.userservice.usermanagement.repository.MongoRoleRepository;
-import com.userservice.usermanagement.repository.MongoUserRepository;
+
 import com.userservice.usermanagement.security.jwt.JwtUtils;
 import com.userservice.usermanagement.security.services.UserDetailsImpl;
 import javax.validation.Valid;
@@ -37,11 +39,11 @@ public class AuthController {
 	@Autowired
 	AuthenticationManager authenticationManager;
 
-	@Autowired
-	MongoUserRepository userRepository;
+	
+	UserDao<?> userRepository;
 
-	@Autowired
-	MongoRoleRepository roleRepository;
+	
+	RoleDao<?>roleRepository;
 
 	@Autowired
 	PasswordEncoder encoder;

@@ -4,11 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.userservice.usermanagement.dao.RoleDao;
+import com.userservice.usermanagement.dao.RoleMongoDao;
+import com.userservice.usermanagement.dao.RolePostgresDao;
 import com.userservice.usermanagement.dao.UserDao;
 import com.userservice.usermanagement.dao.UserMongoDao;
 import com.userservice.usermanagement.dao.UserPostgresDao;
-import com.userservice.usermanagement.models.MongoUserModel;
-import com.userservice.usermanagement.models.PostgresUserModel;
+
+import com.userservice.usermanagement.models.UserModel;
 
 @Configuration
 public class Config {
@@ -18,14 +21,26 @@ public class Config {
 	 */
 	@Bean
 	@Profile("postgres")
-	public UserDao<PostgresUserModel> userPostgresDao() {
+	public UserPostgresDao userPostgresDao() {
 		return new UserPostgresDao();
 	}
 
 	@Bean
 	@Profile("mongo")
-	public UserDao<MongoUserModel> userMongoDao() {
+	public UserMongoDao userMongoDao() {
 		return new UserMongoDao();
+	}
+	
+	@Bean
+	@Profile("mongo")
+	public RoleMongoDao roleMongoDao() {
+		return new RoleMongoDao();
+	}
+
+	@Bean
+	@Profile("postgres")
+	public RolePostgresDao rolePostgresDao() {
+		return new RolePostgresDao();
 	}
 
 }
